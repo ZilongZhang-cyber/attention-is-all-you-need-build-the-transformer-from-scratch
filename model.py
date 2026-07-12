@@ -31,8 +31,19 @@ def build_id_to_token_vocab(token_to_id):
         id_to_token[tid] = token
     return id_to_token
 
-# Step 3 - encode_sentence_to_ids (not yet solved)
-# TODO: implement
+# Step 3 - encode_sentence_to_ids
+def encode_sentence_to_ids(sentence, token_to_id, unk_token='<unk>'):
+    # TODO: convert whitespace tokens of `sentence` to ids via `token_to_id`, using `unk_token`'s id for OOV
+    ids = []
+    unk_id = token_to_id[unk_token]  # 先拿到 <unk> 的 id，免得每次循环都查
+
+    for token in sentence.split():
+        if token in token_to_id:
+            ids.append(token_to_id[token])
+        else:
+            ids.append(unk_id)  # 不认识的词，统一用 <unk> 兜底
+
+    return ids
 
 # Step 4 - decode_ids_to_tokens (not yet solved)
 # TODO: implement
