@@ -179,8 +179,13 @@ def mask_attention_scores_with_neg_inf(scores, mask):
     # TODO: replace blocked positions of scores with negative infinity
     return scores.masked_fill(~mask, float("-inf"))
 
-# Step 20 - softmax_attention_weights (not yet solved)
-# TODO: implement
+# Step 20 - softmax_attention_weights
+import torch
+
+def softmax_attention_weights(masked_scores):
+    # TODO: softmax over the last axis, zeroing rows that are entirely -inf
+    weights = torch.nn.functional.softmax(masked_scores,dim=-1)
+    return torch.nan_to_num(weights)
 
 # Step 21 - apply_attention_weights_to_values (not yet solved)
 # TODO: implement
