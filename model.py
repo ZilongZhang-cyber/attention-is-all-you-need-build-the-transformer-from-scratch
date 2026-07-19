@@ -237,8 +237,13 @@ def merge_heads_back_to_model_dim(multi_head_tensor):
     B,H,L,d_k = multi_head_tensor.shape
     return multi_head_tensor.transpose(1,2).reshape(B,L,H*d_k).contiguous()
 
-# Step 26 - apply_linear_projection (not yet solved)
-# TODO: implement
+# Step 26 - apply_linear_projection
+def apply_linear_projection(x, weight, bias):
+    # TODO: return x @ weight^T + bias (bias may be None) with shape (..., out_features)
+    if bias is None:
+        return x @ weight.T
+    else:
+        return x @ weight.T + bias
 
 # Step 27 - project_to_query_key_value (not yet solved)
 # TODO: implement
