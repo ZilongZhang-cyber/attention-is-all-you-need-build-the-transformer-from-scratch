@@ -525,8 +525,35 @@ def init_encoder_layer_parameters(d_model, num_heads, d_ff):
 
     return params
 
-# Step 53 - init_decoder_layer_parameters (not yet solved)
-# TODO: implement
+# Step 53 - init_decoder_layer_parameters
+import torch
+
+def init_decoder_layer_parameters(d_model, num_heads, d_ff):
+    # TODO: return a dict of requires_grad tensors for one decoder layer
+    scale = 1.0 / math.sqrt(d_model)
+    params = {}
+    for name, shape in [
+        ("w_q_self", (d_model, d_model)), ("w_k_self", (d_model, d_model)),
+        ("w_v_self", (d_model, d_model)), ("w_o_self", (d_model, d_model)),
+        ("w_q_cross", (d_model, d_model)), ("w_k_cross", (d_model, d_model)),
+        ("w_v_cross", (d_model, d_model)), ("w_o_cross", (d_model, d_model)),
+        ("w1", (d_model, d_ff)), ("w2", (d_ff, d_model)),
+    ]:
+        t = torch.empty(shape, dtype=torch.float32)
+        t.normal_(0, scale)
+        t.requires_grad_(True)
+        params[name] = t
+
+    for name, size in [("b1", d_ff), ("b2", d_model),
+                        ("self_beta", d_model), ("cross_beta", d_model),
+                        ("ffn_beta", d_model)]:
+        params[name] = torch.zeros(size, dtype=torch.float32, requires_grad=True)
+
+    for name, size in [("self_gamma", d_model), ("cross_gamma", d_model),
+                        ("ffn_gamma", d_model)]:
+        params[name] = torch.ones(size, dtype=torch.float32, requires_grad=True)
+
+    return params
 
 # Step 54 - init_embedding_and_projection_parameters (not yet solved)
 # TODO: implement
