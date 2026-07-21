@@ -512,7 +512,7 @@ def init_encoder_layer_parameters(d_model, num_heads, d_ff):
         ("w1", (d_model, d_ff)), ("w2", (d_ff, d_model)),
     ]:
         t = torch.empty(shape, dtype=torch.float32)
-        t.normal_(0, scale)
+        t.normal_(0, scale) # 直接乘法和改变分布是等效的操作，乘法会让叶子节点失效
         t.requires_grad_(True)
         params[name] = t
 
