@@ -619,8 +619,13 @@ def shift_targets_right_with_start_token(target_ids, start_token_id):
     output[:, 1:] = target_ids[:, :-1]            # 后面的列 = target 去掉最后一列
     return output
 
-# Step 57 - compute_noam_learning_rate (not yet solved)
-# TODO: implement
+# Step 57 - compute_noam_learning_rate
+def compute_noam_learning_rate(step, d_model, warmup_steps):
+    # TODO: return the Noam warmup learning rate for the given step.
+    step = max(step, 1)  # 防止第 0 步除零
+    arg1 = step ** -0.5                           # 衰减部分: 1/√step
+    arg2 = step * (warmup_steps ** -1.5)          # 升温部分: step / warmup_steps^1.5
+    return float((d_model ** -0.5) * min(arg1, arg2))
 
 # Step 58 - build_uniform_smoothing_distribution (not yet solved)
 # TODO: implement
