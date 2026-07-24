@@ -718,8 +718,15 @@ def update_adam_second_moment(v_prev, grad, beta2):
     # TODO: apply Adam's EMA update for the second moment of the gradient
     return beta2 * v_prev + (1 - beta2) * grad ** 2
 
-# Step 67 - apply_adam_bias_correction (not yet solved)
-# TODO: implement
+# Step 67 - apply_adam_bias_correction
+import torch
+
+def apply_adam_bias_correction(m_t, v_t, beta1, beta2, step):
+    """Return bias-corrected (m_hat, v_hat) for Adam at the given step."""
+    # TODO: divide each moment by (1 - beta**step) using its respective beta
+    m_hat = m_t / (1 - beta1 ** step)
+    v_hat = v_t / (1 - beta2 ** step)
+    return m_hat, v_hat
 
 # Step 69 - apply_adam_step_to_all_parameters (not yet solved)
 # TODO: implement
