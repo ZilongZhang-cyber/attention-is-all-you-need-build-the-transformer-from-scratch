@@ -728,8 +728,35 @@ def apply_adam_bias_correction(m_t, v_t, beta1, beta2, step):
     v_hat = v_t / (1 - beta2 ** step)
     return m_hat, v_hat
 
-# Step 69 - apply_adam_step_to_all_parameters (not yet solved)
-# TODO: implement
+# Step 69 - apply_adam_step_to_all_parameters
+import torch
+
+def apply_adam_step_to_all_parameters(parameter_list, optimizer_state, learning_rate, beta1=0.9, beta2=0.98, epsilon=1e-9):
+    # TODO: increment t, then for each param with a grad update m, v, bias-correct, and subtract delta in place.
+    optimizer_state['t'] += 1
+    t = optimizer_state['t']
+
+    for i, param in enumerate(parameter_list):
+        if param.grad is None:
+            continue
+
+        grad = param.grad
+
+        # 更新一阶动量 m
+        optimizer_state['m'][i] = beta1 * optimizer_state['m'][i] + (1 - beta1) * grad
+
+        # 更新二阶动量 v
+        optimizer_state['v'][i] = beta2 * optimizer_state['v'][i] + (1 - beta2) * grad ** 2
+
+        # 偏差修正
+        m_hat = optimizer_state['m'][i] / (1 - beta1 ** t)
+        v_hat = optimizer_state['v'][i] / (1 - beta2 ** t)
+
+        # 计算 delta 并更新参数
+        delta = learning_rate * m_hat / (torch.sqrt(v_hat) + epsilon)
+        param.data -= delta
+
+    return optimizer_state
 
 # Step 70 - zero_all_parameter_gradients (not yet solved)
 # TODO: implement
