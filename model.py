@@ -767,8 +767,41 @@ def zero_all_parameter_gradients(parameter_list):
     for param in parameter_list:
         param.grad = None
 
-# Step 71 - compute_batch_training_loss (not yet solved)
-# TODO: implement
+# Step 71 - compute_batch_training_loss
+def compute_batch_training_loss(src_batch, tgt_batch, model_params, config):
+    # TODO: shift targets right, run the forward pass, build smoothed targets, and average the KL loss over non-pad tokens.
+    pad_id = config["pad_id"]
+    start_id = config["start_id"]
+    vocab_size = config["vocab_size"]
+    smoothing = config["smoothing"]
+    num_heads = config["num_heads"]
+
+    # 补齐 model_params 里可能缺失的 key
+    if "token_embedding" not in model_params:
+        model_params["token_embedding"] = model_params["src_embedding"]
+    if "d_model" not in model_params:
+        model_params["d_model"] = model_params["token_embedding"].shape[-1]
+
+    # 1. 右移 target 作为 decoder 输入
+    decoder_input = shift_targets_right_with_start_token(tgt_batch, start_id)
+
+    # 2. 前向传播
+    log_probs = run_transformer_forward(src_batch, decoder_input, model_params, num_heads, pad_id)
+
+    # 3. 构建平滑标准答案
+    batch_size, tgt_seq = tgt_batch.shape
+    shape = (batch_size, tgt_seq, vocab_size)
+    target = build_uniform_smoothing_distribution(shape, vocab_size, smoothing)
+    target = set_confidence_on_gold_tokens(target, tgt_batch, 1.0 - smoothing)
+    target = zero_pad_column_and_pad_token_rows(target, tgt_batch, pad_id)
+
+    # 4. 算 loss
+    total_loss = compute_label_smoothed_kl_loss(log_probs, target)
+
+    # 5. 平均
+    loss = average_loss_over_non_pad_tokens(total_loss, tgt_batch, pad_id)
+
+    return loss
 
 # Step 72 - run_training_step_with_backprop (not yet solved)
 # TODO: implement
