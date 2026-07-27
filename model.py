@@ -803,8 +803,35 @@ def compute_batch_training_loss(src_batch, tgt_batch, model_params, config):
 
     return loss
 
-# Step 72 - run_training_step_with_backprop (not yet solved)
-# TODO: implement
+# Step 72 - run_training_step_with_backprop
+import torch
+
+def run_training_step_with_backprop(src_batch, tgt_batch, parameter_list, model_params, optimizer_state, step_number, config):
+    """Run one training iteration: zero grads, forward, backward, Noam LR, Adam step.
+
+    Returns the scalar loss value for the step as a Python float.
+    """
+    # TODO: zero grads, compute loss, backward, look up Noam LR, apply Adam step
+    # 1. 清空梯度
+    zero_all_parameter_gradients(parameter_list)
+
+    # 2. 前向传播 + 算 loss（带 autograd 图）
+    loss = compute_batch_training_loss(src_batch, tgt_batch, model_params, config)
+
+    # 3. 反向传播（PyTorch 自动算梯度）
+    loss.backward()
+
+    # 4. 查 Noam 学习率
+    lr = compute_noam_learning_rate(step_number, config["d_model"], config["warmup_steps"])
+
+    # 5. Adam 更新参数
+    beta1 = config.get("beta1", 0.9)
+    beta2 = config.get("beta2", 0.98)
+    epsilon = config.get("epsilon", 1e-9)
+    apply_adam_step_to_all_parameters(parameter_list, optimizer_state, lr, beta1, beta2, epsilon)
+
+    # 6. 返回 Python float 用于打印日志
+    return loss.item()
 
 # Step 73 - run_training_loop_for_steps (not yet solved)
 # TODO: implement
