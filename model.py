@@ -905,6 +905,24 @@ def mark_finished_beams(token_ids, finished_flags, end_token_id):
     # TODO: return updated boolean finished flags for each beam given the new token ids
     return finished_flags | (token_ids == end_token_id)
 
-# Step 80 - select_best_finished_beam (not yet solved)
-# TODO: implement
+# Step 80 - select_best_finished_beam
+def select_best_finished_beam(finished_sequences, finished_scores, alpha):
+    # TODO: return the finished beam with the highest length-penalized score
+    best_idx = None
+    best_score = -float('inf')
+
+    for i, seq in enumerate(finished_sequences):
+        raw_score = finished_scores[i]
+        seq_len = len(seq)
+        penalty = compute_length_penalty(seq_len, alpha)
+        normalized = raw_score / penalty
+
+        if normalized > best_score:
+            best_score = normalized
+            best_idx = i
+
+    return {
+        'sequence': finished_sequences[best_idx],
+        'score': best_score
+    }
 
